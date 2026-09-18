@@ -74,10 +74,12 @@ aws ecr get-login-password --region <region> | docker login --username AWS --pas
 Pushing the image to ECR:
 
 ```bash
-docker build -t hello-world-go:latest .
-docker tag hello-world-go:latest <account-id>.dkr.ecr.<region>.amazonaws.com/hello-world-go:latest
-docker push <account-id>.dkr.ecr.<region>.amazonaws.com/hello-world-go:latest
+docker build -t hello-world-go:<version> .
+docker tag hello-world-go:<version> <account-id>.dkr.ecr.<region>.amazonaws.com/hello-world-go:<version>
+docker push <account-id>.dkr.ecr.<region>.amazonaws.com/hello-world-go:<version>
 ```
+
+Use a precise version tag (for example `1.4.0`) instead of `latest`, so the exact image running in the cluster can always be identified and pinned in `deployment.yaml`.
 
 #### 2. Podman
 
@@ -90,10 +92,12 @@ aws ecr get-login-password --region <region> | podman login --username AWS --pas
 Pushing the image to ECR:
 
 ```bash
-podman build -t hello-world-go:latest .
-podman tag hello-world-go:latest <account-id>.dkr.ecr.<region>.amazonaws.com/hello-world-go:latest
-podman push <account-id>.dkr.ecr.<region>.amazonaws.com/hello-world-go:latest
+podman build -t hello-world-go:<version> .
+podman tag hello-world-go:<version> <account-id>.dkr.ecr.<region>.amazonaws.com/hello-world-go:<version>
+podman push <account-id>.dkr.ecr.<region>.amazonaws.com/hello-world-go:<version>
 ```
+
+Use a precise version tag (for example `1.4.0`) instead of `latest`, so the exact image running in the cluster can always be identified and pinned in `deployment.yaml`.
 
 **Note**: To use podman both in windows and wsl, you need podman-remote installed and properly configured.
 
@@ -128,7 +132,7 @@ An added bonus is that you can track the images in Podman Desktop, providing a g
 
 1. Open Podman Desktop.
 2. Navigate to the "Images" section.
-3. Look for the `hello-world-go:latest` image.
+3. Look for the `hello-world-go:<version>` image.
 4. Ensure that the image is listed and has the correct tag.
 
 This confirms that the image has been successfully pushed to ECR and is available for use in Podman Desktop.
@@ -141,7 +145,7 @@ To verify that the image has been successfully pushed to ECR, you can use the fo
 aws ecr describe-images --repository-name hello-world-go
 ```
 
-This command will list all the images in the `hello-world-go` repository, allowing you to confirm that the `hello-world-go:latest` image is present.
+This command will list all the images in the `hello-world-go` repository, allowing you to confirm that the `hello-world-go:<version>` image is present.
 
 ### Clean up ECR
 

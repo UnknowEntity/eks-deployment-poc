@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-go
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hello-world-go
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: hello-world-go
+    spec:
+      volumes:
+      - name: app-credentials
+        secret:
+          secretName: app-credentials-57btd956m2
+      containers:
+      - name: hello-world-go
+        image: 107503902849.dkr.ecr.ap-southeast-1.amazonaws.com/hello-world-go:1.4.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+        - name: ENV
+          value: "PROD"
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+        volumeMounts:
+        - name: app-credentials
+          mountPath: /etc/secret
+          readOnly: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-world-go-lbc
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "external"
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+spec:
+  type: LoadBalancer
+  selector:
+    app: hello-world-go
+  ports:
+  - port: 80
+    targetPort: 8080

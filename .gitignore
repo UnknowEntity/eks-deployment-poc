@@ -2,3 +2,12 @@
 hello-world/config/local.config.toml
 hello-world/config/server.config.toml
 */secret.yaml
+
+terraform/.terraform/
+*.tfvars
+*.tfvars.json
+
+tfplan
+tfplan.txt
+
+*.backup

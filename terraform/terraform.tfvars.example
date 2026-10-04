@@ -1,0 +1,6 @@
+# Use curl checkip.amazonaws.com to find your current public IP address and replace <YOUR_ADMIN_CIDR> with it.
+admin_cidrs = ["<YOUR_ADMIN_CIDR>"]
+# You need to create a TemporaryAdminRole in your AWS account and replace <YOUR_AWS_ACCOUNT_ID> with your actual AWS account ID.
+provider_assume_role_arn = "arn:aws:iam::<YOUR_AWS_ACCOUNT_ID>:role/TemporaryAdminRole"\
+# Replace <YOUR_AWS_PROFILE> with the name of the AWS CLI profile you want to use.
+aws_profile = "<YOUR_AWS_PROFILE>"

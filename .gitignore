@@ -11,3 +11,4 @@ tfplan
 tfplan.txt
 
 *.backup
+.tfstate

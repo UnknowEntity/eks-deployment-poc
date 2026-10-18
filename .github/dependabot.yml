@@ -1,0 +1,24 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: gomod
+    directory: /hello-world
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: docker
+    directory: /hello-world
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: terraform
+    directories:
+      - /terraform-ci
+      - /terraform
+      - /terraform/aws
+    schedule:
+      interval: weekly

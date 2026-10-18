@@ -30,7 +30,7 @@ jobs:
       contents: read
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v4
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
     - name: Create placeholder local config
       run: cp hello-world/config/ci.config.toml hello-world/config/local.config.toml
@@ -47,7 +47,7 @@ jobs:
       repo_uri: ${{ steps.build_repo_uri.outputs.repo_uri }}
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v4
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
     - name: Get merged hash
       id: get_merged_hash
@@ -65,7 +65,7 @@ jobs:
         echo "AWS_REGION=$AWS_REGION" >> $GITHUB_ENV
 
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v6.3.0
+      uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
       with:
         role-to-assume: ${{ env.AWS_ROLE_ARN }}
         aws-region: ${{ env.AWS_REGION }}
@@ -115,13 +115,13 @@ jobs:
     steps:
     - name: Create GitHub App token
       id: app-token
-      uses: actions/create-github-app-token@v2
+      uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2.2.2
       with:
         app-id: ${{ vars.COMMIT_BOT_APP_ID }}
         private-key: ${{ secrets.COMMIT_BOT_PRIVATE_KEY }}
 
     - name: Checkout Code
-      uses: actions/checkout@v4
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       with:
           fetch-depth: 0
           token: ${{ steps.app-token.outputs.token }}

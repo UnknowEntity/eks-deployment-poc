@@ -49,44 +49,58 @@ The region defaults to `ap-southeast-1`; change it in `terraform/variables.tf`
 if needed. The variables file is gitignored because it can contain sensitive
 account configuration. Keep it, Terraform state, and saved plan files private.
 
-## Initialize, plan, and apply
+## Standard Terraform workflow
 
-Initialize Terraform and review the proposed infrastructure changes:
+Use this workflow for every change to `terraform/` and `terraform-ci/`, run from
+the directory of the stack you are changing. Terraform is run locally and
+deliberately, rather than from CI, because changes are infrequent and you keep
+full control over what is applied.
 
-```bash
-terraform init
-terraform plan
-```
+1. Initialize providers and modules:
 
-Apply the plan after confirming it targets the intended AWS account and region:
+   ```bash
+   terraform init
+   ```
 
-```bash
-terraform apply
-```
+2. Check the configuration is valid:
 
-Terraform displays the changes and asks for confirmation before applying.
+   ```bash
+   terraform validate
+   ```
 
-### Optional: save and inspect a plan
+3. Save a plan:
 
-To save a plan for inspection before applying that exact plan:
+   ```bash
+   terraform plan -out=tfplan
+   ```
 
-```bash
-terraform plan -out=tfplan
-terraform show tfplan
-```
+4. Export the plan as plain text for review:
 
-For a plain-text file that is easier to review:
+   ```bash
+   terraform show -no-color tfplan > tfplan.txt
+   ```
 
-```bash
-terraform show -no-color tfplan > tfplan.txt
-```
+5. Review `tfplan.txt` manually. Confirm it targets the intended AWS account and
+   region, and that nothing is replaced or destroyed unexpectedly.
+6. Apply exactly the plan you reviewed:
 
-Review the output before applying. Saved plans and their text output can contain
-sensitive values; do not commit or share them. Apply the saved plan with:
+   ```bash
+   terraform apply tfplan
+   ```
 
-```bash
-terraform apply tfplan
-```
+7. After the change is applied and working, format the code and commit:
+
+   ```bash
+   terraform fmt
+   git add . && git commit
+   ```
+
+Formatting comes last on purpose: it avoids churn while you iterate, and it only
+changes whitespace in code you have already proven works.
+
+`tfplan` and `tfplan.txt` are gitignored but can contain sensitive values. Do not
+share them, and delete them once the plan has been applied. If the configuration
+changes after planning, create a new plan instead of applying the old one.
 
 ## Connect to the cluster
 
@@ -120,19 +134,22 @@ removed. Follow the [shared cleanup checks](setup-and-cleanup.md#shared-cleanup-
 A remaining load balancer can block or stall cleanup of dependent networking
 resources.
 
-From the `terraform/` directory, review what Terraform will destroy:
+From the `terraform/` directory, follow the same
+[standard workflow](#standard-terraform-workflow), using a destroy plan, and
+review what Terraform will remove:
 
 ```bash
-terraform plan -destroy
+terraform plan -destroy -out=tfplan
+terraform show -no-color tfplan > tfplan.txt
 ```
 
 If the plan is expected, destroy the Terraform-managed infrastructure:
 
 ```bash
-terraform destroy
+terraform apply tfplan
 ```
 
-Review the proposed deletions and confirm when prompted. This removes
+Review the plan before applying. This removes
 Terraform-managed resources, including the EKS cluster, VPC, NAT Gateway,
 and controller resources. The ECR repository and CI role are managed by
 `terraform-ci/` and are untouched; destroy them separately from that directory

@@ -1,0 +1,4 @@
+title = "CI Placeholder Configuration"
+
+[token]
+value = "INVALID_PLACEHOLDER_DO_NOT_USE"

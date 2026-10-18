@@ -22,6 +22,10 @@ provides a plan to review before applying changes. See the
 [`Terraform setup guide`](terraform-setup.md) for variable configuration,
 planning, applying, and destroying the infrastructure.
 
+The ECR repository and GitHub Actions role are managed separately by
+`terraform-ci/`, so CI can run without the EKS cluster. See the
+[CI guide](ci.md).
+
 ## Workload access to AWS: IRSA or EKS Pod Identity
 
 Kubernetes workloads that call AWS services need AWS credentials. This
@@ -73,7 +77,9 @@ aws eks list-clusters \
   --region <region>
 ```
 
-Check for ECR repositories:
+Check for ECR repositories. The repository managed by `terraform-ci/` is
+expected to remain after the cluster is destroyed; destroy that stack
+separately when CI is no longer needed:
 
 ```bash
 aws ecr describe-repositories \

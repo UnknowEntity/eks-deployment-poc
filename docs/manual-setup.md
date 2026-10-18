@@ -65,7 +65,9 @@ kubectl get nodes
 
 ## Create the ECR repository
 
-Create the application repository if it does not already exist:
+If you applied `terraform-ci/` (see the [CI guide](ci.md)), the repository
+already exists and you can skip this section. Otherwise, create the application
+repository if it does not already exist:
 
 ```bash
 aws ecr describe-repositories --repository-names hello-world-go

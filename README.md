@@ -59,6 +59,16 @@ tearing down the cluster.
 
 See the [Setup and Cleanup guide](docs/setup-and-cleanup.md).
 
+## CI
+
+A GitHub Actions workflow builds the image, pushes it to ECR, and updates
+`deployment.yaml`. Its AWS resources (ECR repository and OIDC role) are created
+by the lightweight `terraform-ci/` configuration, separate from the EKS stack
+in `terraform/`, so you can run and debug CI cheaply.
+
+The workflow also needs a GitHub environment and a GitHub App for the commit
+bot. See the [CI guide](docs/ci.md) for setup.
+
 ## Deployment
 
 Once the cluster and ECR repository are ready, follow the application deployment

@@ -4,6 +4,10 @@ This guide uses the Terraform configuration in `terraform/` to create and
 manage the EKS environment. In this repository, Terraform installs the AWS
 Load Balancer Controller and configures EKS Pod Identity for its ServiceAccount.
 
+The ECR repository and the GitHub Actions OIDC role are **not** part of this
+configuration. They live in `terraform-ci/` so CI can run without the cost of
+the cluster. Apply `terraform-ci/` first; see the [CI guide](ci.md).
+
 ## Prerequisites
 
 - Terraform 1.2 or later.
@@ -14,8 +18,8 @@ Load Balancer Controller and configures EKS Pod Identity for its ServiceAccount.
   infrastructure in this configuration.
 
 Terraform creates a VPC with a NAT Gateway, an EKS cluster and managed node
-group, the controller's Pod Identity resources, and the `hello-world-go` ECR
-repository. These resources can incur AWS charges.
+group, and the controller's Pod Identity resources. These resources can incur
+AWS charges.
 
 ## Configure Terraform variables
 
@@ -130,6 +134,7 @@ terraform destroy
 
 Review the proposed deletions and confirm when prompted. This removes
 Terraform-managed resources, including the EKS cluster, VPC, NAT Gateway,
-controller resources, and ECR repository. The repository is configured to allow
-force deletion, so its images will be deleted as well. Run the shared cleanup
-checks afterward and review any AWS resources that remain.
+and controller resources. The ECR repository and CI role are managed by
+`terraform-ci/` and are untouched; destroy them separately from that directory
+(this also deletes the images) when you no longer need CI. Run the shared
+cleanup checks afterward and review any AWS resources that remain.

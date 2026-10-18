@@ -20,8 +20,23 @@ type TokenConfig struct {
 	Value string `toml:"value"`
 }
 
+// placeholderToken is the nonsense value in config/ci.config.toml (used for CI builds).
+const placeholderToken = "INVALID_PLACEHOLDER_DO_NOT_USE"
+
 type Server struct {
 	Config Config
+	IsProd bool
+}
+
+// rejectPlaceholder returns 500 in prod when the placeholder config is loaded.
+func (s *Server) rejectPlaceholder(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if s.IsProd && s.Config.Token.Value == placeholderToken {
+			http.Error(w, "Server misconfigured: placeholder config in use", http.StatusInternalServerError)
+			return
+		}
+		next(w, r)
+	}
 }
 
 // The handler function handles incoming HTTP requests.
@@ -75,11 +90,11 @@ func main() {
 	mux := http.NewServeMux()
 
 	// Register the handler function for the root path "/"
-	server := &Server{Config: config}
+	server := &Server{Config: config, IsProd: env == "PROD"}
 	mux.HandleFunc("/", server.helloHandler)
 	mux.HandleFunc("/healthz", healthzHandler)
 	mux.HandleFunc("/readyz", readyzHandler)
-	mux.HandleFunc("/token", server.tokenHandler)
+	mux.HandleFunc("/token", server.rejectPlaceholder(server.tokenHandler))
 
 	// Define the port to listen on
 	port := ":8080"

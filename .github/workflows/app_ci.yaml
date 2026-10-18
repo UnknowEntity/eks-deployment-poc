@@ -68,6 +68,9 @@ jobs:
         echo "REPO_URI=$REPO_URI" >> $GITHUB_ENV
         echo "repo_uri=$REPO_URI" >> "$GITHUB_OUTPUT"
 
+    - name: Create placeholder local config
+      run: cp hello-world/config/ci.config.toml hello-world/config/local.config.toml
+
     - name: build Docker image
       run: |
         echo "Building Docker image with tag ${{ env.REPO_URI }}:${{ env.MERGED_HASH }}"

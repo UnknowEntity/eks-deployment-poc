@@ -70,7 +70,9 @@ jobs:
 
     - name: build Docker image
       run: |
-        docker build . --file ./hello-world/Dockerfile --tag ${{ env.REPO_URI }}:${{ env.MERGED_HASH }}
+        echo "Building Docker image with tag ${{ env.REPO_URI }}:${{ env.MERGED_HASH }}"
+        cd ./hello-world
+        docker build . --file ./Dockerfile --tag ${{ env.REPO_URI }}:${{ env.MERGED_HASH }}
 
     - name: Push Docker image to ECR
       run: |

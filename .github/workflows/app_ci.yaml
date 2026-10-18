@@ -1,0 +1,125 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - hello-world/**
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+
+  build:
+    if: github.actor != 'commit-bot-1234[bot]'
+    runs-on: ubuntu-latest
+    environment: "main"
+    outputs:
+      merged_hash: ${{ steps.get_merged_hash.outputs.merged_hash }}
+      repo_uri: ${{ steps.build_repo_uri.outputs.repo_uri }}
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Get merged hash
+      id: get_merged_hash
+      run: |
+        MERGED_HASH=$(git rev-parse HEAD)
+        echo "Merged hash is $MERGED_HASH"
+        echo "MERGED_HASH=$MERGED_HASH" >> $GITHUB_ENV
+        echo "merged_hash=$MERGED_HASH" >> "$GITHUB_OUTPUT"
+
+    - name: Get AWS configuration from file
+      run: |
+        AWS_ROLE_ARN=$(jq -r '.role_arn' config/aws.json)
+        AWS_REGION=$(jq -r '.region' config/aws.json)
+        echo "AWS_ROLE_ARN=$AWS_ROLE_ARN" >> $GITHUB_ENV
+        echo "AWS_REGION=$AWS_REGION" >> $GITHUB_ENV
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v6.3.0
+      with:
+        role-to-assume: ${{ env.AWS_ROLE_ARN }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Get AWS account info
+      run: |
+        AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+        echo "AWS Account ID is $AWS_ACCOUNT_ID"
+        echo "AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID" >> $GITHUB_ENV
+
+    - name: Get repo name
+      run: |
+        REPO_NAME=$(jq -r '.["repo-name"]' hello-world/deployment.config.json)
+        echo "Repository name is $REPO_NAME"
+        echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
+      
+    - name: build repo uri
+      id: build_repo_uri
+      run: |
+        REPO_URI="${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.REPO_NAME }}"
+        echo "Repository URI is $REPO_URI"
+        echo "REPO_URI=$REPO_URI" >> $GITHUB_ENV
+        echo "repo_uri=$REPO_URI" >> "$GITHUB_OUTPUT"
+
+    - name: build Docker image
+      run: |
+        docker build . --file ./hello-world/Dockerfile --tag ${{ env.REPO_URI }}:${{ env.MERGED_HASH }}
+
+    - name: Push Docker image to ECR
+      run: |
+        aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.REPO_URI }}
+        docker push ${{ env.REPO_URI }}:${{ env.MERGED_HASH }}
+
+  commit:
+    if: github.actor != 'commit-bot-1234[bot]'
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: write
+
+    steps:
+    - name: Create GitHub App token
+      id: app-token
+      uses: actions/create-github-app-token@v2
+      with:
+        app-id: ${{ vars.COMMIT_BOT_APP_ID }}
+        private-key: ${{ secrets.COMMIT_BOT_PRIVATE_KEY }}
+
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+          fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
+
+    - name: Set environment variables from build step
+      run: |
+        echo "MERGED_HASH=${{ needs.build.outputs.merged_hash }}" >> $GITHUB_ENV
+        echo "REPO_URI=${{ needs.build.outputs.repo_uri }}" >> $GITHUB_ENV
+
+    - name: Update deployment.yaml
+      run: |
+        git pull --rebase origin main
+        sed -i -E "s|(image:[[:space:]]*)[^[:space:]]+|\1${REPO_URI}:${MERGED_HASH}|" hello-world/deployment.yaml
+
+    - name: Verify deployment.yaml updated
+      run: |
+        grep -q "image: ${REPO_URI}:${MERGED_HASH}" hello-world/deployment.yaml || {
+          echo "deployment.yaml was not updated, so the sed pattern didn't match"
+          exit 1
+        }
+
+    - name: Commit Docker image changes
+      run: |
+        git config user.name "commit-bot-1234[bot]"
+        git config user.email "commit-bot-1234[bot]@users.noreply.github.com"
+        git add ./hello-world/deployment.yaml
+        git commit -m "Update Docker image to ${MERGED_HASH} [skip ci]" || echo "No changes to commit"
+        git push origin main
+

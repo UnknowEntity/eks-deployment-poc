@@ -1,5 +1,3 @@
-data "aws_caller_identity" "current" {}
-
 locals {
   tags = {
     GithubRepo = var.github_repository
@@ -35,6 +33,18 @@ module "ecr" {
   tags = local.tags
 }
 
+# Uncomment and configure the OIDC provider if it already exists in your AWS account.
+# import {
+#   to = aws_iam_openid_connect_provider.github
+#   identity = {
+#     "arn" = "<oidc-provider-arn>"
+#   }
+# }
+
+# resource "aws_iam_openid_connect_provider" "github" {
+#   ### Configuration omitted for brevity ###
+# }
+
 resource "aws_iam_openid_connect_provider" "github" {
   url = "https://token.actions.githubusercontent.com"
 
@@ -63,7 +73,7 @@ data "aws_iam_policy_document" "assume_role" {
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.github_username}/${var.github_repository}:environment:${var.environment_name}"]
+      values   = ["repo:${var.github_username}@${var.github_user_id}/${var.github_repository}@${var.github_repository_id}:environment:${var.environment_name}"]
     }
   }
 }

@@ -35,6 +35,10 @@ Details:
   image embeds a placeholder token instead of a real one.
 - The bot commit message contains `[skip ci]`, and both jobs skip runs whose
   actor is `commit-bot-1234[bot]`, which prevents a loop.
+- Third-party actions are pinned to full commit SHAs (the version is in a
+  trailing comment). [Dependabot](../.github/dependabot.yml) opens weekly PRs
+  that bump the actions, Go modules, Docker base image, and Terraform providers.
+  Review the PRs, since the `build-check` job validates the image build.
 - Runs are serialized per ref (`concurrency`) and never cancelled mid-push.
 
 ## Create the CI AWS resources

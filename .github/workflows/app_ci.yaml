@@ -6,6 +6,10 @@ on:
     paths:
       - hello-world/**
       - .github/workflows/app_ci.yaml
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - hello-world/**
   workflow_dispatch:
 
 permissions:
@@ -18,8 +22,24 @@ concurrency:
 
 jobs:
 
+  # Build-only check for PRs: no AWS access, no push.
+  build-check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Create placeholder local config
+      run: cp hello-world/config/ci.config.toml hello-world/config/local.config.toml
+
+    - name: Build Docker image
+      run: docker build ./hello-world --file ./hello-world/Dockerfile --tag hello-world-go:pr-check
+
   build:
-    if: github.actor != 'commit-bot-1234[bot]'
+    if: github.event_name != 'pull_request' && github.actor != 'commit-bot-1234[bot]'
     runs-on: ubuntu-latest
     environment: "main"
     outputs:
@@ -85,7 +105,7 @@ jobs:
         docker push ${{ env.REPO_URI }}:${{ env.MERGED_HASH }}
 
   commit:
-    if: github.actor != 'commit-bot-1234[bot]'
+    if: github.event_name != 'pull_request' && github.actor != 'commit-bot-1234[bot]'
     runs-on: ubuntu-latest
     environment: "main"
     needs: build

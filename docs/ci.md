@@ -15,10 +15,13 @@ Triggers:
 
 - a push to `main` that changes files under `hello-world/` or the workflow file
   itself;
+- a pull request to `main` that changes files under `hello-world/`; this only
+  runs the `build-check` job;
 - a manual run from the Actions tab (`workflow_dispatch`), useful for debugging.
 
 | Job | Purpose |
 |-----|---------|
+| `build-check` | Pull requests only. Builds the image to catch Dockerfile or compile errors. Uses no AWS access, pushes nothing, and needs no environment or secrets. |
 | `build` | Assumes the AWS role through OIDC, builds the image tagged with the commit SHA, and pushes it to ECR. |
 | `commit` | Updates the `image:` line in `hello-world/deployment.yaml` and pushes the commit as a GitHub App bot. |
 

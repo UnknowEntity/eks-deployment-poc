@@ -23,7 +23,7 @@ spec:
           secretName: app-credentials-57btd956m2
       containers:
       - name: hello-world-go
-        image: 107503902849.dkr.ecr.ap-southeast-1.amazonaws.com/hello-world-go:c05f8c402c9dd2f344a115679e4b650fcc7557c7
+        image: 107503902849.dkr.ecr.ap-southeast-1.amazonaws.com/hello-world-go:9fa76d220733a4bbdc1ac08ad37ca5956ad5da08
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

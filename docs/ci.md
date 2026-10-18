@@ -59,12 +59,9 @@ Edit `terraform.tfvars`:
   `curl -s https://api.github.com/repos/<username>/<repository> | jq .id`.
 - `environment_name`: the GitHub environment used by the workflow (`main`).
 
-Then apply:
-
-```bash
-terraform init
-terraform apply
-```
+Then, from `terraform-ci/`, follow the
+[standard Terraform workflow](terraform-setup.md#standard-terraform-workflow)
+(`init`, `validate`, `plan -out`, review, `apply` the saved plan, then `fmt`).
 
 Terraform creates:
 

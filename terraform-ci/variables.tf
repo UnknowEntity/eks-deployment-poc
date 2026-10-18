@@ -26,8 +26,18 @@ variable "github_username" {
   type        = string
 }
 
+variable "github_user_id" {
+  description = "The GitHub user ID (use curl -s https://api.github.com/users/<username> | jq .id)"
+  type        = string
+}
+
 variable "github_repository" {
   description = "The GitHub repository name"
+  type        = string
+}
+
+variable "github_repository_id" {
+  description = "The GitHub repository ID (use curl -s https://api.github.com/repos/<username>/<repository> | jq .id)"
   type        = string
 }
 

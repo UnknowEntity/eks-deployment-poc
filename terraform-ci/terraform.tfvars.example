@@ -4,5 +4,13 @@ provider_assume_role_arn = "arn:aws:iam::<YOUR_AWS_ACCOUNT_ID>:role/TemporaryAdm
 aws_profile = "<YOUR_AWS_PROFILE>"
 
 github_username = "<YOUR_GITHUB_USERNAME>"
+# Github user id
+# Use this command to get the id
+# curl -s https://api.github.com/users/<YOUR_GITHUB_USERNAME> | jq .id
+github_user_id = "<YOUR_GITHUB_USER_ID>"
 github_repository = "<YOUR_GITHUB_REPOSITORY>"
+# Github repo id
+# Use this command to get the id
+# curl -s https://api.github.com/repos/<YOUR_GITHUB_USERNAME>/<YOUR_GITHUB_REPOSITORY> | jq .id
+github_repository_id = "<YOUR_GITHUB_REPOSITORY_ID>"
 environment_name = "<YOUR_ENVIRONMENT_NAME>"

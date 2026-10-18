@@ -27,7 +27,7 @@ type Server struct {
 // The handler function handles incoming HTTP requests.
 func (s *Server) helloHandler(w http.ResponseWriter, r *http.Request) {
 	// Send a simple text response back to the client
-	fmt.Fprint(w, "Hello, World! You have reached the Go server (v4).")
+	fmt.Fprint(w, "Hello, World! You have reached the Go server (v5).")
 }
 
 func (s *Server) tokenHandler(w http.ResponseWriter, r *http.Request) {

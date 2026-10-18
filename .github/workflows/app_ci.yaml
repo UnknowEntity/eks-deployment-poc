@@ -30,7 +30,7 @@ jobs:
       contents: read
     steps:
     - name: Checkout Code
-      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
     - name: Create placeholder local config
       run: cp hello-world/config/ci.config.toml hello-world/config/local.config.toml
@@ -47,7 +47,7 @@ jobs:
       repo_uri: ${{ steps.build_repo_uri.outputs.repo_uri }}
     steps:
     - name: Checkout Code
-      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
     - name: Get merged hash
       id: get_merged_hash
@@ -121,7 +121,7 @@ jobs:
         private-key: ${{ secrets.COMMIT_BOT_PRIVATE_KEY }}
 
     - name: Checkout Code
-      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
           fetch-depth: 0
           token: ${{ steps.app-token.outputs.token }}

@@ -7,24 +7,24 @@ resource "helm_release" "lb_controller" {
 
   set = [
     {
-        name = "clusterName"
-        value = local.cluster_name
+      name  = "clusterName"
+      value = local.cluster_name
     },
     {
-        name = "serviceAccount.name"
-        value = local.lb_controller_service_account_name
+      name  = "serviceAccount.name"
+      value = local.lb_controller_service_account_name
     },
     {
-        name = "serviceAccount.create"
-        value = "false"
+      name  = "serviceAccount.create"
+      value = "false"
     },
     {
-        name = "region"
-        value = var.region
+      name  = "region"
+      value = var.region
     },
     {
-        name = "vpcId"
-        value = module.aws.vpc_id
+      name  = "vpcId"
+      value = module.aws.vpc_id
     }
   ]
 

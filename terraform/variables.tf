@@ -5,9 +5,9 @@ variable "admin_cidrs" {
 }
 
 variable "provider_assume_role_arn" {
-  type = string
+  type        = string
   description = "The ARN of the role to assume for the AWS provider"
-  sensitive = true
+  sensitive   = true
 }
 
 variable "region" {

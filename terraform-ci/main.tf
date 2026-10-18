@@ -35,6 +35,18 @@ module "ecr" {
   tags = local.tags
 }
 
+# Uncomment and configure the OIDC provider if it already exists in your AWS account.
+# import {
+#   to = aws_iam_openid_connect_provider.github
+#   identity = {
+#     "arn" = "<oidc-provider-arn>"
+#   }
+# }
+
+# resource "aws_iam_openid_connect_provider" "github" {
+#   ### Configuration omitted for brevity ###
+# }
+
 resource "aws_iam_openid_connect_provider" "github" {
   url = "https://token.actions.githubusercontent.com"
 

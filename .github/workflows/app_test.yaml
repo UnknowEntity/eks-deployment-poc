@@ -1,0 +1,23 @@
+name: App Test
+
+on:
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - hello-world/**
+
+permissions:
+  contents: read
+
+jobs:
+  build-check:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+    - name: Create placeholder local config
+      run: cp hello-world/config/ci.config.toml hello-world/config/local.config.toml
+
+    - name: Build Docker image
+      run: docker build ./hello-world --file ./hello-world/Dockerfile --tag hello-world-go:pr-check
